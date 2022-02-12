@@ -34,7 +34,8 @@ async def websocket_endpoint(ws):
 async def sse_generator(req):
     id = req.path_params["id"]
     stream = zlib.compressobj()
-    for i in itertools.count():
+    start = int(req.headers.get("last-event-id", 0))
+    for i in itertools.count(start):
         data = get_data(id, i)
         data = b"id: %d\ndata: %d\n\n" % (i, data)
         yield stream.compress(data)
