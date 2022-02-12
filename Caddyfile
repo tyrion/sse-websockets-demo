@@ -1,0 +1,24 @@
+localhost
+
+bind 127.0.0.1 ::1
+
+root ./static
+file_server browse
+
+encode zstd gzip
+
+@websockets {
+	header Connection *Upgrade*
+	header Upgrade websocket
+}
+
+handle /ws1 {
+	reverse_proxy @websockets 127.0.1.1:6001
+}
+
+handle /ws2 {
+	reverse_proxy @websockets 127.0.1.1:6002
+}
+
+reverse_proxy /sse1 127.0.1.1:6001
+reverse_proxy /sse2 127.0.1.1:6002

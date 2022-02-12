@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello!</title>
+  <script>
+    const wss = [];
+
+    function startWS(i) {
+      if (wss[i] !== undefined) return;
+
+      const ws = wss[i] = new WebSocket("wss://localhost/ws"+i);
+      ws.onopen = e => console.log("WebSocket opened");
+      ws.onmessage = e => console.log(e.data);
+    }
+
+    function closeWS(i) {
+      if (wss[i] !== undefined) {
+        console.log("Closing websocket");
+        wss[i].close();
+        delete wss[i];
+      }
+    }
+
+    const ess = [];
+    function startES(i) {
+      if (ess[i] !== undefined) return;
+
+      const es = ess[i] = new EventSource("https://localhost/sse"+i);
+      es.onopen = e => console.log("ES open");
+      es.onerror = e => console.log("ES error");
+      es.onmessage = e => console.log(e.data);
+    }
+
+    function closeES(i) {
+      if (ess[i] !== undefined) {
+        console.log("Closing EventSource");
+        ess[i].close()
+        delete ess[i]
+      }
+    }
+  </script>
+</head>
+
+<h1>Hello</h1>
+
+<button onclick="startWS(1)">Start WS1</button>
+<button onclick="closeWS(1)">Close WS1</button>
+<br>
+<button onclick="startWS(2)">Start WS2</button>
+<button onclick="closeWS(2)">Close WS2</button>
+<br>
+<button onclick="startES(1)">Start ES1</button>
+<button onclick="closeES(1)">Close ES1</button>
+<br>
+<button onclick="startES(2)">Start ES2</button>
+<button onclick="closeES(2)">Close ES2</button>
