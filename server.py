@@ -1,6 +1,7 @@
 import asyncio
 import random
 import itertools
+import zlib
 
 from starlette.responses import StreamingResponse
 from starlette.applications import Starlette
@@ -32,10 +33,12 @@ async def websocket_endpoint(ws):
 
 async def sse_generator(req):
     id = req.path_params["id"]
+    stream = zlib.compressobj()
     for i in itertools.count():
         data = get_data(id, i)
         data = b"id: %d\ndata: %d\n\n" % (i, data)
-        yield data
+        yield stream.compress(data)
+        yield stream.flush(zlib.Z_SYNC_FLUSH)
         await asyncio.sleep(1)
 
 
@@ -47,5 +50,6 @@ async def sse_endpoint(req):
             "Content-type": "text/event-stream",
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
+            "Content-Encoding": "deflate",
         },
     )
